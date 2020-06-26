@@ -94,6 +94,15 @@
     mode: 0640
   when: kafka_connect_service_name != kafka_connect_default_service_name
 
+- name: Deploy JMX Exporter Config File
+  copy:
+    src: "kafka_connect.yml"
+    dest: "{{kafka_connect_jmxexporter_config_path}}"
+    mode: 0640
+    owner: "{{kafka_connect_user}}"
+    group: "{{kafka_connect_group}}"
+  when: jmxexporter_enabled|bool
+
 - name: Create Service Override Directory
   file:
     path: "{{kafka_connect_default_systemd_override_file | dirname}}"
