@@ -29,6 +29,7 @@ kafka_broker:
   config_file: /etc/kafka/server.properties
   systemd_file: "{{default_systemd_dir}}/{{kafka_broker_service_name}}.service"
   systemd_override: /etc/systemd/system/{{kafka_broker_service_name}}.service.d/override.conf
+kafka_broker_confluent_metrics_reporter_cls: "io.confluent.metrics.reporter.ConfluentMetricsReporter"
 
 schema_registry_service_name: confluent-schema-registry
 schema_registry_packages:
@@ -67,6 +68,8 @@ kafka_connect_default_group: confluent
 kafka_connect_default_config_file: /etc/kafka/connect-distributed.properties
 kafka_connect_default_systemd_file: "{{default_systemd_dir}}/{{kafka_connect_default_service_name}}.service"
 kafka_connect_default_systemd_override_file: /etc/systemd/system/{{kafka_connect_default_service_name}}.service.d/override.conf
+kafka_connect_confluent_metrics_consumer_interceptor_cls: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
+kafka_connect_confluent_metrics_producer_interceptor_cls: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
 
 ksql_service_name: "{{(confluent_package_version is version('5.5.0', '>=')) | ternary('confluent-ksqldb' , 'confluent-ksql')}}"
 ksql_main_package: "{{(confluent_package_version is version('5.5.0', '>=')) | ternary('confluent-ksqldb' , 'confluent-ksql')}}"
@@ -86,6 +89,8 @@ ksql:
   config_file: "{{(confluent_package_version is version('5.5.0', '>=')) | ternary('/etc/ksqldb/ksql-server.properties' , '/etc/ksql/ksql-server.properties')}}"
   systemd_file: "{{default_systemd_dir}}/{{ksql_service_name}}.service"
   systemd_override: /etc/systemd/system/{{ksql_service_name}}.service.d/override.conf
+ksql_confluent_metrics_consumer_interceptor_cls: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
+ksql_confluent_metrics_producer_interceptor_cls: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
 
 kafka_rest_service_name: confluent-kafka-rest
 kafka_rest_packages:
