@@ -106,7 +106,7 @@ all:
     ## Fips only works with ssl_enabled: true and confluent_server_enabled: true
     # fips_enabled: true
     #### Configuring Multiple Listeners ####
-    ## CP-Ansible will configure two listeners on the broker: an internal listener for the broker to communicate and an external for the components and other clients.
+    ## CP-Ansible will configure two listeners on the broker: a broker listener for the broker to communicate and an internal for the components and other clients.
     ## If you only need one listener uncomment this line:
     # kafka_broker_configure_additional_brokers: false
     ## By default both of these listeners will follow whatever you set for ssl_enabled and sasl_protocol.
@@ -174,7 +174,7 @@ all:
     # rbac_component_additional_system_admins:
     #   - user1
     #   - user2
-    ## By default the Confluent CLI will be installed on each host, to stop this download set:
+    ## By default the Confluent CLI will be installed on each host *when rbac is enabled*, to stop this download set:
     # confluent_cli_download_enabled: false
     ## CLI will be downloaded from Confluent's webservers, to customize the location of the binary set:
     # confluent_cli_custom_download_url: <URL to custom webserver hosting for confluent cli>

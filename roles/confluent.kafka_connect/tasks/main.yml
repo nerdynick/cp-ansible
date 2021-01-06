@@ -38,7 +38,7 @@
     keystore_storepass: "{{kafka_connect_keystore_storepass}}"
     keystore_keypass: "{{kafka_connect_keystore_keypass}}"
     service_name: kafka_connect
-    hostnames: "{{ [ansible_host, ansible_fqdn] | unique }}"
+    hostnames: "{{ [inventory_hostname, ansible_fqdn, ansible_host, ansible_ssh_host] | unique }}"
     ca_cert_path: "{{kafka_connect_ca_cert_path}}"
     cert_path: "{{kafka_connect_cert_path}}"
     key_path: "{{kafka_connect_key_path}}"
@@ -76,7 +76,7 @@
     state: directory
     group: "{{kafka_connect_group}}"
     owner: "{{kafka_connect_user}}"
-    mode: 0750
+    mode: 0770
 
 - name: Create Connect Distributed log4j Config
   template:
