@@ -4,6 +4,7 @@ kafka_connect_custom_log4j: "{{ custom_log4j }}"
 kafka_connect_java_args:
   - "{% if kafka_connect_jolokia_enabled|bool %}-javaagent:{{jolokia_jar_path}}=port={{kafka_connect_jolokia_port}},host=0.0.0.0{% if kafka_connect_jolokia_ssl_enabled|bool %},keystore={{kafka_connect_keystore_path}},keystorePassword={{kafka_connect_keystore_storepass}},protocol=https{% endif %}{% endif %}"
   - "{% if kafka_connect_custom_log4j|bool %}-Dlog4j.configuration=file:{{kafka_connect.log4j_file}}{% endif %}"
+  - "{% if kafka_connect_jmxexporter_enabled|bool %}-javaagent:{{jmxexporter_jar_path}}={{kafka_connect_jmxexporter_port}}:{{kafka_connect_jmxexporter_config_path}}{% endif %}"
 
 kafka_connect_custom_java_args: ""
 kafka_connect_final_java_args: "{{ kafka_connect_java_args + [ kafka_connect_custom_java_args ] }}"
@@ -24,6 +25,16 @@ kafka_connect_secret_registry_key: 39ff95832750c0090d84ddf5344583832efe91ef
 
 kafka_connect_group_id: connect-cluster
 
+kafka_connect_confluent_metrics_enabled: true
+kafka_connect_confluent_metrics_servers: "{{groups['kafka_broker']}}"
+kafka_connect_confluent_metrics_listener: "{{kafka_broker_listeners[kafka_connect_kafka_listener_name]}}"
+kafka_connect_confluent_metrics_bootstrap_servers: "{% for host in kafka_connect_confluent_metrics_servers %}{% if loop.index > 1%},{% endif %}{{ hostvars[host]['ansible_host']|default(host) }}:{{kafka_connect_confluent_metrics_listener.port}}{% endfor %}"
+
+kafka_connect_metric_consumer_interceptors: []
+kafka_connect_metric_consumer_interceptors_final: "{{kafka_connect_metric_consumer_interceptors + [kafka_connect_confluent_metrics_consumer_interceptor_cls] if kafka_connect_confluent_metrics_enabled|bool else kafka_connect_metric_consumer_interceptors}}"
+kafka_connect_metric_producer_interceptors: []
+kafka_connect_metric_producer_interceptors_final: "{{kafka_connect_metric_producer_interceptors + [kafka_connect_confluent_metrics_producer_interceptor_cls] if kafka_connect_confluent_metrics_enabled|bool else kafka_connect_metric_producer_interceptors}}"
+
 kafka_connect_plugins_path:
   - /usr/share/java
 
@@ -38,7 +49,10 @@ kafka_connect_plugins: []
 kafka_connect_plugins_remote: []
 kafka_connect_plugins_dest: /usr/share/java
 
-
+kafka_connect_service_name: "{{kafka_connect_default_service_name}}"
+kafka_connect_config_file: "{{kafka_connect_default_config_file}}"
+kafka_connect_systemd_file: "{{default_systemd_dir}}/{{kafka_connect_service_name}}.service"
+kafka_connect_systemd_override_file: /etc/systemd/system/{{kafka_connect_service_name}}.service.d/override.conf
 kafka_connect:
   appender_log_path: /var/log/kafka/
   appender_log_name: connect-distributed.log
@@ -46,8 +60,6 @@ kafka_connect:
   appender_log_file_size: 100MB
   properties:
     rest.port: "{{kafka_connect_rest_port}}"
-    consumer.interceptor.classes: io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor
-    producer.interceptor.classes: io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor
     config.storage.replication.factor: "{{ kafka_connect_default_internal_replication_factor }}"
     config.storage.topic: "{{kafka_connect_group_id}}-configs"
     group.id: "{{kafka_connect_group_id}}"

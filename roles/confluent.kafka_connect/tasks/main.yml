@@ -61,7 +61,7 @@
 - name: Create Connect Distributed Config
   template:
     src: connect-distributed.properties.j2
-    dest: "{{kafka_connect.config_file}}"
+    dest: "{{kafka_connect_config_file}}"
     mode: 0640
     owner: "{{kafka_connect_user}}"
     group: "{{kafka_connect_group}}"
@@ -87,9 +87,25 @@
     group: "{{kafka_connect_group}}"
   notify: restart connect distributed
 
+- name: Create Custom systemd file
+  template:
+    src: systemd.j2
+    dest: "{{kafka_connect_systemd_file}}"
+    mode: 0640
+  when: kafka_connect_service_name != kafka_connect_default_service_name
+
+- name: Deploy JMX Exporter Config File
+  copy:
+    src: "kafka_connect.yml"
+    dest: "{{kafka_connect_jmxexporter_config_path}}"
+    mode: 0640
+    owner: "{{kafka_connect_user}}"
+    group: "{{kafka_connect_group}}"
+  when: jmxexporter_enabled|bool
+
 - name: Create Service Override Directory
   file:
-    path: "{{kafka_connect.systemd_override | dirname}}"
+    path: "{{kafka_connect_systemd_override_file | dirname}}"
     owner: "{{kafka_connect_user}}"
     group: "{{kafka_connect_group}}"
     state: directory
@@ -98,7 +114,7 @@
 - name: Write Service Overrides
   template:
     src: override.conf.j2
-    dest: "{{ kafka_connect.systemd_override }}"
+    dest: "{{ kafka_connect_systemd_override_file }}"
     mode: 0640
     owner: "{{kafka_connect_user}}"
     group: "{{kafka_connect_group}}"

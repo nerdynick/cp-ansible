@@ -133,8 +133,8 @@ kafka_broker_jolokia_enabled: "{{jolokia_enabled}}"
 kafka_broker_jolokia_port: 7771
 kafka_broker_jolokia_ssl_enabled: "{{ ssl_enabled }}"
 kafka_broker_jolokia_java_arg_ssl_addon: ",keystore={{kafka_broker_keystore_path}},keystorePassword={{kafka_broker_keystore_storepass}},protocol=https"
-kafka_broker_jolokia_urp_url: "{{ 'https' if kafka_broker_jolokia_ssl_enabled|bool else 'http' }}://{{inventory_hostname}}:{{kafka_broker_jolokia_port}}/jolokia/read/kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions"
-kafka_broker_jolokia_active_controller_url: "{{ 'https' if kafka_broker_jolokia_ssl_enabled|bool else 'http' }}://{{inventory_hostname}}:{{kafka_broker_jolokia_port}}/jolokia/read/kafka.controller:type=KafkaController,name=ActiveControllerCount"
+kafka_broker_jolokia_urp_url: "{{ 'https' if kafka_broker_jolokia_ssl_enabled|bool else 'http' }}://{{ansible_host}}:{{kafka_broker_jolokia_port}}/jolokia/read/kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions"
+kafka_broker_jolokia_active_controller_url: "{{ 'https' if kafka_broker_jolokia_ssl_enabled|bool else 'http' }}://{{ansible_host}}:{{kafka_broker_jolokia_port}}/jolokia/read/kafka.controller:type=KafkaController,name=ActiveControllerCount"
 
 kafka_broker_jmxexporter_enabled: "{{jmxexporter_enabled}}"
 kafka_broker_jmxexporter_config_path: /opt/prometheus/kafka.yml
@@ -163,6 +163,10 @@ schema_registry_jolokia_enabled: "{{jolokia_enabled}}"
 schema_registry_jolokia_port: 7772
 schema_registry_jolokia_ssl_enabled: "{{ schema_registry_ssl_enabled }}"
 
+schema_registry_jmxexporter_enabled: "{{jmxexporter_enabled}}"
+schema_registry_jmxexporter_config_path: /opt/prometheus/schema_registry.yml
+schema_registry_jmxexporter_port: 8078
+
 # Kafka Rest Variables
 kafka_rest_user: "{{kafka_rest_default_user}}"
 kafka_rest_group: "{{kafka_rest_default_group}}"
@@ -186,6 +190,10 @@ kafka_rest_jolokia_enabled: "{{jolokia_enabled}}"
 kafka_rest_jolokia_port: 7775
 kafka_rest_jolokia_ssl_enabled: "{{ kafka_rest_ssl_enabled }}"
 
+kafka_rest_jmxexporter_enabled: "{{jmxexporter_enabled}}"
+kafka_rest_jmxexporter_config_path: /opt/prometheus/kafka_rest.yml
+kafka_rest_jmxexporter_port: 8075
+
 # Kafka Connect Variables
 kafka_connect_user: "{{kafka_connect_default_user}}"
 kafka_connect_group: "{{kafka_connect_default_group}}"
@@ -208,6 +216,10 @@ kafka_connect:
 kafka_connect_jolokia_enabled: "{{jolokia_enabled}}"
 kafka_connect_jolokia_port: 7773
 kafka_connect_jolokia_ssl_enabled: "{{ kafka_connect_ssl_enabled }}"
+
+kafka_connect_jmxexporter_enabled: "{{jmxexporter_enabled}}"
+kafka_connect_jmxexporter_config_path: /opt/prometheus/kafka_connect.yml
+kafka_connect_jmxexporter_port: 8077
 
 # KSQL Variables
 ksql_user: "{{ksql_default_user}}"
@@ -233,6 +245,10 @@ ksql_jolokia_enabled: "{{jolokia_enabled}}"
 ksql_jolokia_port: 7774
 ksql_jolokia_ssl_enabled: "{{ ksql_ssl_enabled }}"
 
+ksql_jmxexporter_enabled: "{{jmxexporter_enabled}}"
+ksql_jmxexporter_config_path: /opt/prometheus/ksql.yml
+ksql_jmxexporter_port: 8076
+
 # Control Center Variables
 control_center_user: "{{control_center_default_user}}"
 control_center_group: "{{control_center_default_group}}"
@@ -241,6 +257,7 @@ control_center_listener_hostname: "0.0.0.0"
 control_center_ssl_enabled: "{{ssl_enabled}}"
 control_center_ssl_mutual_auth_enabled: "{{ ssl_mutual_auth_enabled }}"
 control_center_http_protocol: "{{ 'https' if control_center_ssl_enabled|bool else 'http' }}"
+
 control_center_truststore_path: "/var/ssl/private/control_center.truststore.jks"
 control_center_keystore_path: "/var/ssl/private/control_center.keystore.jks"
 control_center_truststore_storepass: "{{ ssl_truststore_password if ssl_provided_keystore_and_truststore|bool else 'confluenttruststorepass'}}"
@@ -249,6 +266,16 @@ control_center_keystore_keypass: "{{ ssl_keystore_key_password if ssl_provided_k
 control_center_ca_cert_path: "/var/ssl/private/ca.crt"
 control_center_cert_path: "/var/ssl/private/control_center.crt"
 control_center_key_path: "/var/ssl/private/control_center.key"
+
+control_center_rest_truststore_path: "{{control_center_truststore_path}}"
+control_center_rest_keystore_path: "{{control_center_keystore_path}}"
+control_center_rest_truststore_storepass: "{{ ssl_rest_truststore_password | default(control_center_truststore_storepass) }}"
+control_center_rest_keystore_storepass: "{{ ssl_rest_keystore_store_password | default(control_center_keystore_storepass) }}"
+control_center_rest_keystore_keypass: "{{ ssl_rest_keystore_key_password | default(control_center_keystore_keypass) }}"
+control_center_rest_ca_cert_path: "{{control_center_ca_cert_path}}"
+control_center_rest_cert_path: "{{control_center_cert_path}}"
+control_center_rest_key_path: "{{control_center_key_path}}"
+
 control_center_kafka_listener_name: internal
 control_center:
   log4j_file: /etc/confluent-control-center/control-center_log4j.properties
