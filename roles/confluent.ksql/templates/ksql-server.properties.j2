@@ -64,7 +64,6 @@ ksql.schema.registry.basic.auth.user.info={{ ksql_ldap_user }}:{{ ksql_ldap_pass
 {% endif %}
 
 # Monitoring Configuration
-<<<<<<< HEAD
 {% if ksql_metric_producer_interceptors_final|length > 0 %}
 producer.interceptor.classes={{ksql_metric_producer_interceptors_final|join(',')}}
 {% endif %}
@@ -73,9 +72,6 @@ consumer.interceptor.classes={{ksql_metric_consumer_interceptors_final|join(',')
 {% endif %}
 {% if ksql_confluent_metrics_enabled|bool %}
 confluent.monitoring.interceptor.bootstrap.servers={{ksql_confluent_metrics_bootstrap_servers}}
-=======
-confluent.monitoring.interceptor.bootstrap.servers={% for host in groups['kafka_broker'] %}{% if loop.index > 1%},{% endif %}{{ hostvars[host]['ansible_host']|default(host) }}:{{kafka_broker_listeners[ksql_kafka_listener_name]['port']}}{% endfor %}
->>>>>>> support-host-alias
 
 {% set config_prefix = 'confluent.monitoring.interceptor.' %}
 {% set listener = ksql_confluent_metrics_listener %}

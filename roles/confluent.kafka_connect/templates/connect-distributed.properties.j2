@@ -124,32 +124,24 @@ consumer.sasl.login.callback.handler.class=io.confluent.kafka.clients.plugins.au
 {% endif %}
 
 # Producer Monitoring Configuration
-<<<<<<< HEAD
 {% if kafka_connect_metric_producer_interceptors_final|length > 0 %}
 producer.interceptor.classes={{kafka_connect_metric_producer_interceptors_final|join(',')}}
 {% endif %}
 {% if kafka_connect_confluent_metrics_enabled|bool %}
 producer.confluent.monitoring.interceptor.bootstrap.servers={{kafka_connect_confluent_metrics_bootstrap_servers}}
-=======
-producer.confluent.monitoring.interceptor.bootstrap.servers={% for host in groups['kafka_broker'] %}{% if loop.index > 1%},{% endif %}{{ hostvars[host]['ansible_host']|default(host) }}:{{kafka_broker_listeners[kafka_connect_kafka_listener_name]['port']}}{% endfor %}
 
->>>>>>> support-host-alias
 {% set config_prefix = 'producer.confluent.monitoring.interceptor.' %}
 {% set listener = kafka_connect_confluent_metrics_listener %}
 {% include 'roles/confluent.kafka_broker/templates/kafka_client.j2' %}
 {% endif %}
 
 # Consumer Monitoring Configuration
-<<<<<<< HEAD
 {% if kafka_connect_metric_consumer_interceptors_final|length > 0 %}
 consumer.interceptor.classes={{kafka_connect_metric_consumer_interceptors_final|join(',')}}
 {% endif %}
 {% if kafka_connect_confluent_metrics_enabled|bool %}
 consumer.confluent.monitoring.interceptor.bootstrap.servers={{kafka_connect_confluent_metrics_bootstrap_servers}}
-=======
-consumer.confluent.monitoring.interceptor.bootstrap.servers={% for host in groups['kafka_broker'] %}{% if loop.index > 1%},{% endif %}{{ hostvars[host]['ansible_host']|default(host) }}:{{kafka_broker_listeners[kafka_connect_kafka_listener_name]['port']}}{% endfor %}
 
->>>>>>> support-host-alias
 {% set config_prefix = 'consumer.confluent.monitoring.interceptor.' %}
 {% set listener = kafka_connect_confluent_metrics_listener %}
 {% include 'roles/confluent.kafka_broker/templates/kafka_client.j2' %}
